@@ -23,7 +23,7 @@ func (b *Bot) CmdHelp(msg joe.Message) error {
 	var resp = []string{
 		"Here's how you can interract with me",
 		"------------------------------------",
-		"cluster list: List known clusters",
+		"get clusters: List known clusters",
 	}
 	msg.Respond(pre(resp))
 	return nil
@@ -38,21 +38,17 @@ func (b *Bot) CmdHi(msg joe.Message) error {
 	return nil
 }
 
-const GqlClusters = `
-{
-	cluster: clusters_v1 {
-		name
-	}
-}
-`
-
-func (b *Bot) CmdClusters(msg joe.Message) error {
+func (b *Bot) CmdGetClusters(msg joe.Message) error {
 	err := b.Auth.CheckPermission("admin", msg.AuthorID)
 	if err != nil {
 		return msg.RespondE("You are not allowed to run this command")
 	}
 
-	req := graphql.NewRequest(GqlClusters)
+	req := graphql.NewRequest(`{
+		cluster: clusters_v1 {
+			name
+		}
+	}`)
 	req.Header.Set("Authorization", "Basic "+b.GqlBasicAuth)
 
 	var res struct {

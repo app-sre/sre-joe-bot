@@ -33,7 +33,7 @@ func main() {
 
 	bot.Respond("hi", bot.CmdHi)
 	bot.Respond("help", bot.CmdHelp)
-	bot.Respond("cluster list", bot.CmdClusters)
+	bot.Respond("get cluster[s]?", bot.CmdGetClusters)
 
 	// TODO: This is not working at the moment. See: https://github.com/go-joe/joe/issues/25
 	bot.Respond(".*", bot.CmdInvalid)
