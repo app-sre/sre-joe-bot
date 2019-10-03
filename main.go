@@ -34,6 +34,8 @@ func main() {
 	bot.Respond("hi", bot.CmdHi)
 	bot.Respond("help", bot.CmdHelp)
 	bot.Respond("get cluster[s]?", bot.CmdGetClusters)
+	bot.Respond("get schema[s]?", bot.CmdGetSchemas)
+	bot.Respond("get schema[s]? (.+)", bot.CmdGetSchema)
 
 	// TODO: This is not working at the moment. See: https://github.com/go-joe/joe/issues/25
 	bot.Respond(".*", bot.CmdInvalid)
