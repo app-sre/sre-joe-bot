@@ -1,4 +1,4 @@
-package main
+package bot
 
 import (
 	"context"
@@ -12,14 +12,14 @@ import (
 	"go.uber.org/zap"
 )
 
-func (b *SREBot) CmdInvalid(msg joe.Message) error {
+func (b *Bot) CmdInvalid(msg joe.Message) error {
 	// TODO: enable this after fix is merged https://github.com/go-joe/slack-adapter/pull/6
 	//b.Logger.Info("Invalid Command", zap.String("user", msg.AuthorID), zap.String("command", msg.Text))
 	//msg.Respond("Hi! I'm a bot and `%s` in an invalid command. Try `help`", msg.Text)
 	return nil
 }
 
-func (b *SREBot) CmdHelp(msg joe.Message) error {
+func (b *Bot) CmdHelp(msg joe.Message) error {
 	b.Logger.Info("Command", zap.String("user", msg.AuthorID), zap.String("command", msg.Text))
 	var resp = []string{
 		"Here's how you can interract with me",
@@ -30,7 +30,7 @@ func (b *SREBot) CmdHelp(msg joe.Message) error {
 	return nil
 }
 
-func (b *SREBot) CmdHi(msg joe.Message) error {
+func (b *Bot) CmdHi(msg joe.Message) error {
 	user, err := b.Slack.GetUserInfo(msg.AuthorID)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ const GqlClusters = `
 }
 `
 
-func (b *SREBot) CmdClusters(msg joe.Message) error {
+func (b *Bot) CmdClusters(msg joe.Message) error {
 	err := b.Auth.CheckPermission("admin", msg.AuthorID)
 	if err != nil {
 		return msg.RespondE("You are not allowed to run this command")
