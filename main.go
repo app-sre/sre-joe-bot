@@ -1,47 +1,38 @@
 package main
 
 import (
-	"net/http"
+	"log"
 	"os"
 	"strings"
 
-	"github.com/go-joe/joe"
-	joeslack "github.com/go-joe/slack-adapter"
-	"github.com/machinebox/graphql"
-	"github.com/nlopes/slack"
+	"github.com/jfchevrette/sre-joe-bot/bot"
 )
 
-type SREBot struct {
-	*joe.Bot
-	Slack *slack.Client
-	Gql   *graphql.Client
-}
-
 func main() {
-	httpClient := http.Client{}
-	g := graphql.NewClient(os.Getenv("APPINTERFACE_URL"), graphql.WithHTTPClient(&httpClient))
-
-	s := slack.New(os.Getenv("SLACK_TOKEN"))
-	sa := joeslack.Adapter(os.Getenv("SLACK_TOKEN"))
-	b := &SREBot{
-		Bot:   joe.New("sre-joe-bot", sa),
-		Slack: s,
-		Gql:   g,
+	bot, err := bot.NewBot("sre-joe-bot",
+		bot.WithSlackAdapter(os.Getenv("SLACK_TOKEN")),
+		bot.WithGraphqlClient(
+			os.Getenv("APPINTERFACE_URL"),
+			os.Getenv("APPINTERFACE_AUTH"),
+		),
+	)
+	if err != nil {
+		log.Fatalf("could not create bot: %+v\n", err)
 	}
 
 	adminIDS := strings.Split(os.Getenv("BOT_ADMIN_IDS"), ",")
 	for _, userID := range adminIDS {
 		userID = strings.TrimSpace(userID)
-		b.Auth.Grant("admin", userID)
+		bot.Auth.Grant("admin", userID)
 	}
 
-	b.RespondRegex("^[Hh]i", b.CmdHi)
-	b.RespondRegex("^[Hh]elp", b.CmdHelp)
-	b.RespondRegex("^[Cc]luster [Ll]ist", b.CmdClusters)
-	b.RespondRegex(".*", b.CmdInvalid)
+	bot.RespondRegex("^[Hh]i", bot.CmdHi)
+	bot.RespondRegex("^[Hh]elp", bot.CmdHelp)
+	bot.RespondRegex("^[Cc]luster [Ll]ist", bot.CmdClusters)
+	bot.RespondRegex(".*", bot.CmdInvalid)
 
-	err := b.Run()
+	err = bot.Run()
 	if err != nil {
-		b.Logger.Fatal(err.Error())
+		bot.Logger.Fatal(err.Error())
 	}
 }
