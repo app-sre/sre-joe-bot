@@ -3,6 +3,8 @@
 <p align="center">
 	<a href="https://github.com/go-joe/slack-adapter/releases"><img src="https://img.shields.io/github/tag/go-joe/slack-adapter.svg?label=version&color=brightgreen"></a>
 	<a href="https://circleci.com/gh/go-joe/slack-adapter/tree/master"><img src="https://circleci.com/gh/go-joe/slack-adapter/tree/master.svg?style=shield"></a>
+	<a href="https://goreportcard.com/report/github.com/go-joe/slack-adapter"><img src="https://goreportcard.com/badge/github.com/go-joe/slack-adapter"></a>
+	<a href="https://codecov.io/gh/go-joe/slack-adapter"><img src="https://codecov.io/gh/go-joe/slack-adapter/branch/master/graph/badge.svg"/></a>
 	<a href="https://godoc.org/github.com/go-joe/slack-adapter"><img src="https://img.shields.io/badge/godoc-reference-blue.svg?color=blue"></a>
 	<a href="https://github.com/go-joe/slack-adapter/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-BSD--3--Clause-blue.svg"></a>
 </p>
@@ -15,16 +17,9 @@ This repository contains a module for the [Joe Bot library][joe].
 
 ## Getting Started
 
-Joe is packaged using the new [Go modules][go-modules]. Therefore the recommended
-installation method is to add the adapter to your `go.mod` via:
+This library is packaged using the new [Go modules][go-modules]. You can get it via:
 
 ```
-require github.com/go-joe/slack-adapter v0.5.0
-```
-
-If you do not use modules yet or you want to hack on the code you can also go get it directly:
-
-```bash
 go get github.com/go-joe/slack-adapter
 ```
 
