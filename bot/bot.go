@@ -15,9 +15,16 @@ import (
 type Bot struct {
 	*joe.Bot
 	Modules      []joe.Module
+	Commands     []BotCommand
 	Slack        *slack.Client
 	Gql          *graphql.Client
 	GqlBasicAuth string
+	Version      string
+}
+
+type BotCommand struct {
+	Command string
+	Fun     func(joe.Message) error
 }
 
 func WithSlackAdapter(token string) func(*Bot) error {
@@ -50,6 +57,24 @@ func (b *Bot) setGraphqlClient(url, basicAuth string) error {
 	return b.testGraphqlClient()
 }
 
+func WithVersionCommand(version string) func(*Bot) error {
+	return func(b *Bot) error {
+		return b.setVersionCommand(version)
+	}
+}
+
+func (b *Bot) setVersionCommand(version string) error {
+	b.Version = version
+	b.Commands = append(b.Commands, BotCommand{
+		Command: "version",
+		Fun: func(msg joe.Message) error {
+			msg.Respond("This bot is running version %s", b.Version)
+			return nil
+		},
+	})
+	return nil
+}
+
 func (b *Bot) testGraphqlClient() error {
 	request := graphql.NewRequest(`{
 		__schema {
@@ -78,6 +103,10 @@ func NewBot(name string, configs ...func(*Bot) error) (*Bot, error) {
 	}
 
 	b.Bot = joe.New(name, b.Modules...)
+
+	for _, c := range b.Commands {
+		b.Respond(c.Command, c.Fun)
+	}
 
 	return b, nil
 }

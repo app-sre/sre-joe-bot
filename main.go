@@ -8,8 +8,13 @@ import (
 	"github.com/jfchevrette/sre-joe-bot/bot"
 )
 
+const (
+	botVersion = "0.0.1"
+)
+
 func main() {
 	bot, err := bot.NewBot("sre-joe-bot",
+		bot.WithVersionCommand(botVersion),
 		bot.WithSlackAdapter(os.Getenv("SLACK_TOKEN")),
 		bot.WithGraphqlClient(
 			os.Getenv("APPINTERFACE_URL"),
