@@ -31,9 +31,9 @@ func main() {
 		bot.Auth.Grant("admin", userID)
 	}
 
-	bot.Respond("^hi", bot.CmdHi)
-	bot.Respond("^help", bot.CmdHelp)
-	bot.Respond("^[Cc]luster [Ll]ist", bot.CmdClusters)
+	bot.Respond("hi", bot.CmdHi)
+	bot.Respond("help", bot.CmdHelp)
+	bot.Respond("cluster list", bot.CmdClusters)
 
 	// TODO: This is not working at the moment. See: https://github.com/go-joe/joe/issues/25
 	bot.Respond(".*", bot.CmdInvalid)
