@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -13,7 +14,7 @@ func main() {
 		bot.WithGraphqlClient(os.Getenv("APPINTERFACE_URL")),
 	)
 	if err != nil {
-		bot.Logger.Fatal(err.Error())
+		log.Fatalf("could not create bot: %+v\n", err)
 	}
 
 	adminIDS := strings.Split(os.Getenv("BOT_ADMIN_IDS"), ",")

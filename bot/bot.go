@@ -26,8 +26,13 @@ func WithSlackAdapter(token string) func(*Bot) error {
 
 func (b *Bot) setSlackClient(token string) error {
 	b.Slack = slack.New(token)
-	b.Modules = append(b.Modules, joeslack.Adapter(token))
 
+	_, err := b.Slack.AuthTest()
+	if err != nil {
+		return fmt.Errorf("could not connect to slack: %v", err)
+	}
+
+	b.Modules = append(b.Modules, joeslack.Adapter(token))
 	return nil
 }
 
@@ -48,7 +53,7 @@ func NewBot(name string, configs ...func(*Bot) error) (*Bot, error) {
 	for _, config := range configs {
 		err := config(b)
 		if err != nil {
-			return nil, fmt.Errorf("could not config adapter: %v", err)
+			return nil, err
 		}
 	}
 
