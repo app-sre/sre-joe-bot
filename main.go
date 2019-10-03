@@ -26,10 +26,12 @@ func main() {
 		bot.Auth.Grant("admin", userID)
 	}
 
-	bot.RespondRegex("^[Hh]i", bot.CmdHi)
-	bot.RespondRegex("^[Hh]elp", bot.CmdHelp)
-	bot.RespondRegex("^[Cc]luster [Ll]ist", bot.CmdClusters)
-	bot.RespondRegex(".*", bot.CmdInvalid)
+	bot.Respond("^hi", bot.CmdHi)
+	bot.Respond("^help", bot.CmdHelp)
+	bot.Respond("^[Cc]luster [Ll]ist", bot.CmdClusters)
+
+	// TODO: This is not working at the moment. See: https://github.com/go-joe/joe/issues/25
+	bot.Respond(".*", bot.CmdInvalid)
 
 	err = bot.Run()
 	if err != nil {
