@@ -3,7 +3,6 @@ package bot
 import (
 	"context"
 	"log"
-	"os"
 	"sort"
 	"strings"
 
@@ -54,7 +53,7 @@ func (b *Bot) CmdClusters(msg joe.Message) error {
 	}
 
 	req := graphql.NewRequest(GqlClusters)
-	req.Header.Set("Authorization", "Basic "+os.Getenv("APPINTERFACE_AUTH"))
+	req.Header.Set("Authorization", "Basic "+b.GqlBasicAuth)
 
 	var res struct {
 		Cluster []struct {

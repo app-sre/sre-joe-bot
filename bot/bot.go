@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -13,9 +14,10 @@ import (
 
 type Bot struct {
 	*joe.Bot
-	Modules []joe.Module
-	Slack   *slack.Client
-	Gql     *graphql.Client
+	Modules      []joe.Module
+	Slack        *slack.Client
+	Gql          *graphql.Client
+	GqlBasicAuth string
 }
 
 func WithSlackAdapter(token string) func(*Bot) error {
@@ -36,14 +38,32 @@ func (b *Bot) setSlackClient(token string) error {
 	return nil
 }
 
-func WithGraphqlClient(url string) func(*Bot) error {
+func WithGraphqlClient(url, basicAuth string) func(*Bot) error {
 	return func(b *Bot) error {
-		return b.setGraphqlClient(url)
+		return b.setGraphqlClient(url, basicAuth)
 	}
 }
 
-func (b *Bot) setGraphqlClient(url string) error {
+func (b *Bot) setGraphqlClient(url, basicAuth string) error {
 	b.Gql = graphql.NewClient(url, graphql.WithHTTPClient(&http.Client{}))
+	b.GqlBasicAuth = basicAuth
+	return b.testGraphqlClient()
+}
+
+func (b *Bot) testGraphqlClient() error {
+	request := graphql.NewRequest(`{
+		__schema {
+			types {
+				name
+			}
+		}
+	}`)
+	request.Header.Set("Authorization", "Basic "+b.GqlBasicAuth)
+
+	var response struct{}
+	if err := b.Gql.Run(context.Background(), request, &response); err != nil {
+		return err
+	}
 	return nil
 }
 

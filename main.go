@@ -11,7 +11,10 @@ import (
 func main() {
 	bot, err := bot.NewBot("sre-joe-bot",
 		bot.WithSlackAdapter(os.Getenv("SLACK_TOKEN")),
-		bot.WithGraphqlClient(os.Getenv("APPINTERFACE_URL")),
+		bot.WithGraphqlClient(
+			os.Getenv("APPINTERFACE_URL"),
+			os.Getenv("APPINTERFACE_AUTH"),
+		),
 	)
 	if err != nil {
 		log.Fatalf("could not create bot: %+v\n", err)
