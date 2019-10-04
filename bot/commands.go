@@ -258,8 +258,8 @@ func (b *Bot) CmdGetBotUser(msg joe.Message) error {
 		return err
 	}
 	resp := []string{
-		fmt.Sprintf("User: %s", userID)
-		fmt.Sprintf("Permissions: %s", perms)
+		fmt.Sprintf("User: %s", userID),
+		fmt.Sprintf("Permissions: %s", perms),
 	}
 	msg.Respond(pre(resp))
 	return nil
