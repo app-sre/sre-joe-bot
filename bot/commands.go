@@ -29,7 +29,10 @@ func (b *Bot) CmdHelp(msg joe.Message) error {
 		"help: you're reading it",
 		"version: reports the bot version",
 		"",
-		"get clusters: List known clusters",
+		"get clusters: List clusters",
+		"",
+		"get users: List users",
+		"get user <username>: Show user information",
 		"",
 		"get schema: List app-interface schemas",
 		"get schema <schema>: Show app-interface schema",
@@ -164,5 +167,92 @@ func (b *Bot) CmdGetSchema(msg joe.Message) error {
 	resText, _ := json.MarshalIndent(res, "", "  ")
 
 	msg.Respond(pre([]string{string(resText)}))
+	return nil
+}
+
+func (b *Bot) CmdGetUsers(msg joe.Message) error {
+	req := graphql.NewRequest(`{
+		users: users_v1 {
+			name
+			github_username
+			redhat_username
+			slack_username
+			path
+		}
+	}`)
+	req.Header.Set("Authorization", "Basic "+b.GqlBasicAuth)
+
+	var res struct {
+		Users []struct {
+			Name           string `json:"name"`
+			GithubUsername string `json:"github_username"`
+			RedhatUsername string `json:"redhat_username"`
+			SlackUsername  string `json:"slack_username"`
+			Path           string `json:"path"`
+		} `json:"users"`
+	}
+	if err := b.Gql.Run(context.Background(), req, &res); err != nil {
+		log.Fatal(err)
+	}
+
+	var users []string
+	for _, u := range res.Users {
+		userText := fmt.Sprintf("%s: %s",
+			u.RedhatUsername,
+			u.Name,
+		)
+		users = append(users, userText)
+	}
+	sort.Strings(users)
+
+	msg.Respond(pre(users))
+
+	return nil
+}
+
+func (b *Bot) CmdGetUser(msg joe.Message) error {
+	req := graphql.NewRequest(`{
+		users: users_v1 {
+			name
+			github_username
+			redhat_username
+			slack_username
+			path
+			public_gpg_key
+		}
+	}`)
+	req.Header.Set("Authorization", "Basic "+b.GqlBasicAuth)
+
+	var res struct {
+		Users []struct {
+			Name           string `json:"name"`
+			GithubUsername string `json:"github_username"`
+			RedhatUsername string `json:"redhat_username"`
+			SlackUsername  string `json:"slack_username"`
+			Path           string `json:"path"`
+			PublicGpgKey   string `json:"public_gpg_key"`
+		} `json:"users"`
+	}
+	if err := b.Gql.Run(context.Background(), req, &res); err != nil {
+		log.Fatal(err)
+	}
+
+	for _, u := range res.Users {
+		if u.RedhatUsername == msg.Matches[0] {
+			resText := []string{
+				u.Path,
+				fmt.Sprintf("Name: %s", u.Name),
+				fmt.Sprintf("Username: %s", u.RedhatUsername),
+			}
+			if u.PublicGpgKey != "" {
+				resText = append(resText, fmt.Sprintf("GPG pubkey:\n%s", u.PublicGpgKey))
+
+			}
+			msg.Respond(pre(resText))
+			return nil
+		}
+	}
+
+	msg.Respond("User %s not found", msg.Matches[0])
 	return nil
 }

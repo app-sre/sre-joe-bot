@@ -36,6 +36,8 @@ func main() {
 	bot.Respond("get cluster[s]?", bot.CmdGetClusters)
 	bot.Respond("get schema[s]?", bot.CmdGetSchemas)
 	bot.Respond("get schema[s]? (.+)", bot.CmdGetSchema)
+	bot.Respond("get user[s]?", bot.CmdGetUsers)
+	bot.Respond("get user[s]? (.+)", bot.CmdGetUser)
 
 	// TODO: This is not working at the moment. See: https://github.com/go-joe/joe/issues/25
 	bot.Respond(".*", bot.CmdInvalid)
