@@ -28,16 +28,17 @@ func main() {
 	adminIDS := strings.Split(os.Getenv("BOT_ADMIN_IDS"), ",")
 	for _, userID := range adminIDS {
 		userID = strings.TrimSpace(userID)
-		bot.Auth.Grant("admin", userID)
+		bot.Auth.Grant("bot.admin", userID)
 	}
 
-	bot.Respond("hi", bot.CmdHi)
-	bot.Respond("help", bot.CmdHelp)
-	bot.Respond("get cluster[s]?", bot.CmdGetClusters)
-	bot.Respond("get schema[s]?", bot.CmdGetSchemas)
-	bot.Respond("get schema[s]? (.+)", bot.CmdGetSchema)
-	bot.Respond("get user[s]?", bot.CmdGetUsers)
-	bot.Respond("get user[s]? (.+)", bot.CmdGetUser)
+	bot.Respond("hi", bot.Log(bot.CmdHi))
+	bot.Respond("help", bot.Log(bot.CmdHelp))
+	bot.Respond("get cluster[s]?", bot.Log(bot.CmdGetClusters))
+	bot.Respond("get user[s]?", bot.Log(bot.CmdGetUsers))
+	bot.Respond("get user[s]? (.+)", bot.Log(bot.CmdGetUser))
+
+	bot.Respond("get schema[s]?", bot.Log(bot.Authenticate("bot.admin.read", bot.CmdGetSchemas)))
+	bot.Respond("get schema[s]? (.+)", bot.Log(bot.Authenticate("bot.admin.read", bot.CmdGetSchema)))
 
 	// TODO: This is not working at the moment. See: https://github.com/go-joe/joe/issues/25
 	bot.Respond(".*", bot.CmdInvalid)

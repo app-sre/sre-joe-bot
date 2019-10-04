@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-joe/joe"
 	joeslack "github.com/go-joe/slack-adapter"
+	"go.uber.org/zap"
 
 	"github.com/machinebox/graphql"
 	"github.com/nlopes/slack"
@@ -26,6 +27,8 @@ type BotCommand struct {
 	Command string
 	Fun     func(joe.Message) error
 }
+
+type ResponseFunc func(joe.Message) error
 
 func WithSlackAdapter(token string) func(*Bot) error {
 	return func(b *Bot) error {
@@ -90,6 +93,23 @@ func (b *Bot) testGraphqlClient() error {
 		return err
 	}
 	return nil
+}
+
+func (b *Bot) Log(fun func(joe.Message) error) func(joe.Message) error {
+	return ResponseFunc(func(msg joe.Message) error {
+		b.Logger.Info("Command", zap.String("user", msg.AuthorID), zap.String("command", msg.Text))
+		return fun(msg)
+	})
+}
+
+func (b *Bot) Authenticate(scope string, fun func(joe.Message) error) func(joe.Message) error {
+	return ResponseFunc(func(msg joe.Message) error {
+		err := b.Auth.CheckPermission(scope, msg.AuthorID)
+		if err != nil {
+			return msg.RespondE("You are not allowed to run this command")
+		}
+		return fun(msg)
+	})
 }
 
 func NewBot(name string, configs ...func(*Bot) error) (*Bot, error) {

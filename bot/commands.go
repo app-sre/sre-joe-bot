@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-joe/joe"
 	"github.com/machinebox/graphql"
-	"go.uber.org/zap"
 )
 
 func (b *Bot) CmdInvalid(msg joe.Message) error {
@@ -21,7 +20,6 @@ func (b *Bot) CmdInvalid(msg joe.Message) error {
 }
 
 func (b *Bot) CmdHelp(msg joe.Message) error {
-	b.Logger.Info("Command", zap.String("user", msg.AuthorID), zap.String("command", msg.Text))
 	var resp = []string{
 		"Here's how you can interract with me",
 		"------------------------------------",
@@ -51,11 +49,6 @@ func (b *Bot) CmdHi(msg joe.Message) error {
 }
 
 func (b *Bot) CmdGetClusters(msg joe.Message) error {
-	err := b.Auth.CheckPermission("admin", msg.AuthorID)
-	if err != nil {
-		return msg.RespondE("You are not allowed to run this command")
-	}
-
 	req := graphql.NewRequest(`{
 		cluster: clusters_v1 {
 			name
@@ -84,11 +77,6 @@ func (b *Bot) CmdGetClusters(msg joe.Message) error {
 }
 
 func (b *Bot) CmdGetSchemas(msg joe.Message) error {
-	err := b.Auth.CheckPermission("admin", msg.AuthorID)
-	if err != nil {
-		return msg.RespondE("You are not allowed to run this command")
-	}
-
 	req := graphql.NewRequest(`{
 		__schema {
 			types {
@@ -121,11 +109,6 @@ func (b *Bot) CmdGetSchemas(msg joe.Message) error {
 }
 
 func (b *Bot) CmdGetSchema(msg joe.Message) error {
-	err := b.Auth.CheckPermission("admin", msg.AuthorID)
-	if err != nil {
-		return msg.RespondE("You are not allowed to run this command")
-	}
-
 	req := graphql.NewRequest(fmt.Sprintf(`{
 		__type(name: "%s") {
 			name
