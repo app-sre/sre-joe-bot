@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jfchevrette/sre-joe-bot/bot"
+	"github.com/app-sre/sre-joe-bot/bot"
 )
 
 const (
