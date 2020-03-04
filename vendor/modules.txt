@@ -1,18 +1,18 @@
 # github.com/go-joe/joe v0.10.0
 github.com/go-joe/joe
 github.com/go-joe/joe/reactions
-# github.com/go-joe/slack-adapter v0.6.2
+# github.com/go-joe/slack-adapter v0.9.0
 github.com/go-joe/slack-adapter
 # github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
 # github.com/machinebox/graphql v0.2.2
 github.com/machinebox/graphql
-# github.com/nlopes/slack v0.6.0
+# github.com/nlopes/slack v0.6.1-0.20191106133607-d06c2a2b3249
 github.com/nlopes/slack
 github.com/nlopes/slack/internal/errorsx
 github.com/nlopes/slack/internal/timex
 github.com/nlopes/slack/slackutilsx
-# github.com/pkg/errors v0.8.1
+# github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # go.uber.org/atomic v1.4.0
 go.uber.org/atomic
