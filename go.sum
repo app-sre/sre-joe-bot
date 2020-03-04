@@ -14,6 +14,8 @@ github.com/go-joe/slack-adapter v0.6.2 h1:9WNXv8EbWsRN2ZiF0jGXmWDX8WdaAohU7eWILK
 github.com/go-joe/slack-adapter v0.6.2/go.mod h1:GL/auEArlltJZrMsSQJkPhAGg8z6pF7xOwoqCawom+8=
 github.com/go-joe/slack-adapter v0.9.0 h1:OZEkmJM6/W+l+Gov+VZR3+qUtGmQB+Ixehhm58fB0mw=
 github.com/go-joe/slack-adapter v0.9.0/go.mod h1:OSrCVps8LL+/5IQjIkEBv9OjQfegtY1Xx/zJu22N3GQ=
+github.com/go-joe/slack-adapter v1.0.0 h1:jfi224R4nGeK5rTcNUiecY91/6UnbX9KZKA2DdM+gKc=
+github.com/go-joe/slack-adapter v1.0.0/go.mod h1:K+h9FRMObiCMmpV2EI+9BMnOKLXagAgcATXwcZS/B14=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/gorilla/websocket v1.2.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
 github.com/gorilla/websocket v1.4.0 h1:WDFjx/TMzVgy9VdMMQi2K2Emtwi2QcUQsztZ/zLaH/Q=
