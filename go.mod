@@ -1,4 +1,4 @@
-module github.com/jfchevrette/sre-joe-bot
+module github.com/app-sre/sre-joe-bot
 
 go 1.13
 

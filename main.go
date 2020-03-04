@@ -5,7 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jfchevrette/sre-joe-bot/bot"
+	"github.com/app-sre/sre-joe-bot/bot"
+	"go.uber.org/zap"
 )
 
 const (
@@ -28,7 +29,10 @@ func main() {
 	adminIDS := strings.Split(os.Getenv("BOT_ADMIN_IDS"), ",")
 	for _, userID := range adminIDS {
 		userID = strings.TrimSpace(userID)
-		bot.Auth.Grant("bot.admin", userID)
+		_, err := bot.Auth.Grant("bot.admin", userID)
+		if err != nil {
+			bot.Logger.Fatal("could not add grant", zap.Error(err))
+		}
 	}
 
 	bot.Respond("hi", bot.Log(bot.CmdHi))
@@ -45,6 +49,6 @@ func main() {
 
 	err = bot.Run()
 	if err != nil {
-		bot.Logger.Fatal(err.Error())
+		bot.Logger.Fatal("failed to start bot", zap.Error(err))
 	}
 }
