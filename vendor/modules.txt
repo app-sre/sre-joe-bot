@@ -1,5 +1,6 @@
-# github.com/go-joe/joe v0.8.0
+# github.com/go-joe/joe v0.10.0
 github.com/go-joe/joe
+github.com/go-joe/joe/reactions
 # github.com/go-joe/slack-adapter v0.6.2
 github.com/go-joe/slack-adapter
 # github.com/gorilla/websocket v1.4.1

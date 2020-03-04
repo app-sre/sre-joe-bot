@@ -35,7 +35,7 @@ type Bot struct {
 }
 
 // A Module is an optional Bot extension that can add new capabilities such as
-// a different Brain.Memory implementation or a different Adapter.
+// a different Memory implementation or Adapter.
 type Module interface {
 	Apply(*Config) error
 }
@@ -227,7 +227,12 @@ func (b *Bot) Run() error {
 //
 // If you need complete control over the regular expression, e.g. because you
 // want the patter to match only a substring of the message but not all of it,
-// you can use Bot.RespondRegex(…).
+// you can use Bot.RespondRegex(…). For even more control you can also directly
+// use Brain.RegisterHandler(…) with a function that accepts ReceiveMessageEvent
+// instances.
+//
+// If multiple matching patterns are registered, only the first registered
+// handler is executed.
 func (b *Bot) Respond(msg string, fun func(Message) error) {
 	expr := "^" + msg + "$"
 	b.RespondRegex(expr, fun)
@@ -269,8 +274,14 @@ func (b *Bot) RespondRegex(expr string, fun func(Message) error) {
 			return nil
 		}
 
+		// If the event text matches our regular expression we can already mark
+		// the event context as done so the Brain does not run any other handlers
+		// that might match the received message.
+		FinishEventContent(ctx)
+
 		return fun(Message{
 			Context:  ctx,
+			ID:       evt.ID,
 			Text:     evt.Text,
 			AuthorID: evt.AuthorID,
 			Data:     evt.Data,

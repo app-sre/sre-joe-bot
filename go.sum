@@ -5,6 +5,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/go-joe/joe v0.7.0/go.mod h1:oU4i1doEwEjGpiV6JUDzbntxojDIggaOSIncm4lSBPo=
 github.com/go-joe/joe v0.8.0 h1:q/S16mDS31uw9eqatuytylgapOU6tYqxXVmQIa2mDts=
 github.com/go-joe/joe v0.8.0/go.mod h1:fjDMMKm6GV29+egH/IS57PTKHSBMquckyuM7CmXbUQw=
+github.com/go-joe/joe v0.10.0 h1:dEe0EHhHeshTDGy55Y4HGOZgj0L11TdeMlaTn5JOPQg=
+github.com/go-joe/joe v0.10.0/go.mod h1:fjDMMKm6GV29+egH/IS57PTKHSBMquckyuM7CmXbUQw=
 github.com/go-joe/slack-adapter v0.6.2 h1:9WNXv8EbWsRN2ZiF0jGXmWDX8WdaAohU7eWILKtaGRg=
 github.com/go-joe/slack-adapter v0.6.2/go.mod h1:GL/auEArlltJZrMsSQJkPhAGg8z6pF7xOwoqCawom+8=
 github.com/gorilla/websocket v1.2.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
