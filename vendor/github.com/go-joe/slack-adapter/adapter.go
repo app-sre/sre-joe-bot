@@ -10,7 +10,6 @@ import (
 	"github.com/go-joe/joe"
 	"github.com/go-joe/joe/reactions"
 	"github.com/nlopes/slack"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -142,7 +141,7 @@ func newAdapter(ctx context.Context, client slackAPI, events chan slack.RTMEvent
 
 	resp, err := client.AuthTestContext(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "slack auth test failed")
+		return nil, fmt.Errorf("slack auth test failed: %w", err)
 	}
 
 	a.userID = resp.UserID
@@ -203,7 +202,7 @@ func (a *BotAdapter) handleSlackEvents(brain *joe.Brain) {
 	}
 }
 
-func (a *BotAdapter) handleMessageEvent(ev *slack.MessageEvent, brain *joe.Brain) {
+func (a *BotAdapter) handleMessageEvent(ev *slack.MessageEvent, brain joe.EventEmitter) {
 	// check if the message comes from ourselves
 	if ev.User == a.userID {
 		// msg is from us, ignore it!
@@ -229,7 +228,7 @@ func (a *BotAdapter) handleMessageEvent(ev *slack.MessageEvent, brain *joe.Brain
 }
 
 // See https://api.slack.com/events/reaction_added
-func (a *BotAdapter) handleReactionAddedEvent(ev *slack.ReactionAddedEvent, brain *joe.Brain) {
+func (a *BotAdapter) handleReactionAddedEvent(ev *slack.ReactionAddedEvent, brain joe.EventEmitter) {
 	if ev.User == a.userID {
 		// reaction is from us, ignore it!
 		return
