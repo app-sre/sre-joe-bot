@@ -35,8 +35,9 @@ type Brain struct {
 // An Event represents a concrete event type and optional callbacks that are
 // triggered when the event was processed by all registered handlers.
 type Event struct {
-	Data      interface{}
-	Callbacks []func(Event)
+	Data       interface{}
+	Callbacks  []func(Event)
+	AbortEarly bool
 }
 
 // The shutdownRequest type is used when signaling shutdown information between
@@ -49,6 +50,23 @@ type shutdownRequest struct {
 // An eventHandler is a function that takes a context and the reflected value
 // of a concrete event type.
 type eventHandler func(context.Context, reflect.Value) error
+
+// ctxKey is used to pass meta information to event handlers via the context.
+type ctxKey string
+
+// ctxKeyEvent is the context key under which we can lookup the internal *Event
+// instance in a handler.
+const ctxKeyEvent ctxKey = "event"
+
+// FinishEventContent can be called from within your event handler functions
+// to indicate that the Brain should not execute any other handlers after the
+// calling handler has returned.
+func FinishEventContent(ctx context.Context) {
+	evt, _ := ctx.Value(ctxKeyEvent).(*Event)
+	if evt != nil {
+		evt.AbortEarly = true
+	}
+}
 
 // NewBrain creates a new robot Brain. If the passed logger is nil it will
 // fallback to the zap.NewNop() logger.
@@ -85,17 +103,18 @@ func (b *Brain) isClosed() bool {
 //
 // Allowed function signatures:
 //
-//   // MyCustomEventStruct must be any struct but not a pointer to a struct.
-//   func(MyCustomEventStruct)
+//   // AnyType can be any scalar, struct or interface type as long as it is not
+//   // a pointer.
+//   func(AnyType)
 //
 //   // You can optionally accept a context as the first argument. The context
 //   // is used to signal handler timeouts or when the bot is shutting down.
-//   func(context.Context, MyCustomEventStruct)
+//   func(context.Context, AnyType)
 //
 //   // You can optionally return a single error value. Returning any other type
-//   // or returning more than one value will lead to an error. If the handler
+//   // or returning more than one value is not possible. If the handler
 //   // returns an error it will be logged.
-//   func(MyCustomEventStruct) error
+//   func(AnyType) error
 //
 //   // Event handlers can also accept an interface in which case they will be
 //   // be called for all events which implement the interface. Consequently,
@@ -104,7 +123,7 @@ func (b *Brain) isClosed() bool {
 //   // accept a context and/or return an error like other handlers.
 //   func(context.Context, interface{}) error
 //
-// The event that will be dispatched to the passed handler function corresponds
+// The event, that will be dispatched to the passed handler function, corresponds
 // directly to the accepted function argument. For instance if you want to emit
 // and receive a custom event you can implement it like this:
 //
@@ -114,6 +133,14 @@ func (b *Brain) isClosed() bool {
 //     b.RegisterHandler(func(evt CustomEvent) {
 //         …
 //     })
+//
+// If multiple handlers are registered for the same event type, then they are
+// all executed in the order in which they have been registered.
+//
+// You should register all handlers before you start the bot via Bot.Run(…).
+// While registering handlers later is also possible, any registration errors
+// will silently be ignored if you register an invalid handler when the bot is
+// already running.
 func (b *Brain) RegisterHandler(fun interface{}) {
 	err := b.registerHandler(fun)
 	if err != nil {
@@ -281,6 +308,8 @@ func (b *Brain) handleEvent(ctx context.Context, evt Event) {
 		zap.Int("handlers", len(handlers)),
 	)
 
+	ctx = context.WithValue(ctx, ctxKeyEvent, &evt)
+
 	for _, handler := range handlers {
 		err := b.executeEventHandler(ctx, handler, event)
 		if err != nil {
@@ -288,6 +317,13 @@ func (b *Brain) handleEvent(ctx context.Context, evt Event) {
 				// TODO: somehow log the name of the handler
 				zap.Error(err),
 			)
+		}
+
+		if evt.AbortEarly {
+			// Abort handler execution early instead of running any more
+			// handlers. The event state may have been changed by a handler, e.g.
+			// using the FinishEventContent(…) function.
+			break
 		}
 	}
 
@@ -400,14 +436,8 @@ func checkHandlerParams(handlerFunc reflect.Type) (evtType reflect.Type, withCon
 		}
 	}
 
-	switch evtType.Kind() {
-	case reflect.Struct, reflect.Interface:
-		// ok cool, move on
-	case reflect.Ptr:
-		err = errors.New("event handler argument must be a struct and not a pointer")
-		return
-	default:
-		err = errors.New("event handler argument must be a struct")
+	if evtType.Kind() == reflect.Ptr {
+		err = errors.New("event handler argument cannot be a pointer")
 		return
 	}
 
