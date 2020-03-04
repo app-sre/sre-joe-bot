@@ -1,6 +1,6 @@
 module github.com/app-sre/sre-joe-bot
 
-go 1.13
+go 1.14
 
 require (
 	github.com/go-joe/joe v0.10.0
