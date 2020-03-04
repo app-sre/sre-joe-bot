@@ -1,11 +1,7 @@
-.PHONY: all build image check vendor dependencies
-NAME				:= sre-joe-bot
-REPO				:= quay.io/app-sre/$(NAME)
-TAG					:= $(shell git rev-parse --short HEAD)
+NAME := sre-joe-bot
+REPO := quay.io/app-sre/$(NAME)
+TAG := $(shell git rev-parse --short HEAD)
 
-PKGS				:= $(shell go list ./... | grep -v -E '/vendor/|/test')
-FIRST_GOPATH		:= $(firstword $(subst :, ,$(shell go env GOPATH)))
-GOLANGCI_LINT_BIN	:= $(FIRST_GOPATH)/bin/golangci-lint
 
 ifneq (,$(wildcard $(CURDIR)/.docker))
 	DOCKER_CONF := $(CURDIR)/.docker
@@ -13,67 +9,49 @@ else
 	DOCKER_CONF := $(HOME)/.docker
 endif
 
-.PHONY: all
+ifndef $(GOPATH)
+    GOPATH=$(shell go env GOPATH)
+    export GOPATH
+endif
+
+.PHONY: \
+	all \
+	build \
+	clean \
+	image \
+	image-push \
+	lint \
+	test \
+	vendor\
+	vet
+
 all: build
-
-.PHONY: clean
-clean:
-	# Remove all files and directories ignored by git.
-	git clean -Xfd .
-
-############
-# Building #
-############
 
 build:
 	go build -o $(NAME) .
 
-vendor:
+clean:
+	git clean -Xfd .
+
+vendor:/
 	go mod tidy
 	go mod vendor
 	go mod verify
 
+test:
+	go test -race -cover -covermode=atomic -mod=vendor 
+
+vet:
+	go vet -v ./...
+
+lint:
+	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint 
+	$(GOPATH)/bin/golangci-lint run -D megacheck -E unused,gosimple,staticcheck
+
 image: build
-	docker build -t $(REPO):$(TAG) .
+	docker build -t $(REPO):$(TAG) -f hack/Dockerfile .
 
 image-push:
 	docker tag $(REPO):$(TAG) $(REPO):latest
 	docker --config=$(DOCKER_CONF) push $(REPO):$(TAG)
 	docker --config=$(DOCKER_CONF) push $(REPO):latest
-
-##############
-# Formatting #
-##############
-
-.PHONY: lint
-lint: $(GOLANGCI_LINT_BIN)
-	# megacheck fails to respect build flags, causing compilation failure during linting.
-	# instead, use the unused, gosimple, and staticcheck linters directly
-	$(GOLANGCI_LINT_BIN) run -D megacheck -E unused,gosimple,staticcheck
-
-.PHONY: format
-format: go-fmt
-
-.PHONY: go-fmt
-go-fmt:
-	go fmt $(PKGS)
-
-###########
-# Testing #
-###########
-
-.PHONY: test
-test: test-unit
-
-.PHONY: test-unit
-test-unit:
-	go test -race -short $(PKGS) -count=1
-
-############
-# Binaries #
-############
-
-dependencies: $(GOLANGCI_LINT_BIN)
-
-$(GOLANGCI_LINT_BIN):
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(FIRST_GOPATH)/bin v1.23.8
