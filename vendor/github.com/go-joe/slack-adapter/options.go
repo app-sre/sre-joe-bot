@@ -32,3 +32,21 @@ func WithMessageParams(params slack.PostMessageParameters) Option {
 		return nil
 	}
 }
+
+// WithLogUnknownMessageTypes makes the adapter log unknown message types as
+// error message for debugging. This option is disabled by default.
+func WithLogUnknownMessageTypes() Option {
+	return func(conf *Config) error {
+		conf.LogUnknownMessageTypes = true
+		return nil
+	}
+}
+
+// WithListenPassive makes the adapter listen and respond to all messages not
+// just those directed at it
+func WithListenPassive() Option {
+	return func(conf *Config) error {
+		conf.ListenPassive = true
+		return nil
+	}
+}

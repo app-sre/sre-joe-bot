@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/go-joe/joe"
+	"github.com/go-joe/joe/reactions"
 	"github.com/nlopes/slack"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -20,6 +21,9 @@ type BotAdapter struct {
 	logger  *zap.Logger
 	name    string
 	userID  string
+
+	logUnknownMessageTypes bool
+	listenPassive          bool
 
 	sendMsgParams slack.PostMessageParameters
 
@@ -40,11 +44,19 @@ type Config struct {
 	// SendMsgParams contains settings that are applied to all messages sent
 	// by the BotAdapter.
 	SendMsgParams slack.PostMessageParameters
+
+	// Log unknown message types as error message for debugging. This option is
+	// disabled by default.
+	LogUnknownMessageTypes bool
+
+	// Listen and respond to all messages not just those directed at the Bot User.
+	ListenPassive bool
 }
 
 type slackAPI interface {
 	AuthTestContext(context.Context) (*slack.AuthTestResponse, error)
 	PostMessageContext(ctx context.Context, channelID string, opts ...slack.MsgOption) (respChannel, respTimestamp string, err error)
+	AddReactionContext(ctx context.Context, name string, item slack.ItemRef) error
 	GetUserInfo(user string) (*slack.User, error)
 	Disconnect() error
 }
@@ -121,6 +133,7 @@ func newAdapter(ctx context.Context, client slackAPI, events chan slack.RTMEvent
 		name:          conf.Name,
 		sendMsgParams: conf.SendMsgParams,
 		users:         map[string]joe.User{}, // TODO: cache expiration?
+		listenPassive: conf.ListenPassive,
 	}
 
 	if a.logger == nil {
@@ -153,12 +166,20 @@ func (a *BotAdapter) RegisterAt(brain *joe.Brain) {
 func (a *BotAdapter) handleSlackEvents(brain *joe.Brain) {
 	for msg := range a.events {
 		switch ev := msg.Data.(type) {
-
 		case *slack.MessageEvent:
 			a.handleMessageEvent(ev, brain)
 
+		case *slack.ReactionAddedEvent:
+			a.handleReactionAddedEvent(ev, brain)
+
 		case *slack.RTMError:
-			a.logger.Error("Slack Real Time Messaging (RTM) error", zap.Any("event", ev))
+			a.logger.Error("Slack Real Time Messaging (RTM) error",
+				zap.Int("code", ev.Code),
+				zap.String("msg", ev.Msg),
+			)
+
+		case *slack.UnmarshallingErrorEvent:
+			a.logger.Error("Slack unmarshalling error", zap.Error(ev.ErrorObj))
 
 		case *slack.InvalidAuthEvent:
 			a.logger.Error("Invalid authentication error", zap.Any("event", ev))
@@ -171,7 +192,13 @@ func (a *BotAdapter) handleSlackEvents(brain *joe.Brain) {
 			})
 
 		default:
-			// Ignore other events..
+			if a.logUnknownMessageTypes {
+				a.logger.Error("Received unknown type from Real Time Messaging (RTM) system",
+					zap.String("type", msg.Type),
+					zap.Any("data", msg.Data),
+					zap.String("go_type", fmt.Sprintf("%T", msg.Data)),
+				)
+			}
 		}
 	}
 }
@@ -186,17 +213,38 @@ func (a *BotAdapter) handleMessageEvent(ev *slack.MessageEvent, brain *joe.Brain
 	// check if we have a DM, or standard channel post
 	selfLink := a.userLink(a.userID)
 	direct := strings.HasPrefix(ev.Msg.Channel, "D")
-	if !direct && !strings.Contains(ev.Msg.Text, selfLink) {
+	if !direct && !strings.Contains(ev.Msg.Text, selfLink) && !a.listenPassive {
 		// msg not for us!
 		return
 	}
 
-	text := strings.TrimSpace(strings.TrimPrefix(ev.Text, selfLink))
+	text := strings.TrimSpace(strings.TrimPrefix(ev.Msg.Text, selfLink))
 	brain.Emit(joe.ReceiveMessageEvent{
 		Text:     text,
 		Channel:  ev.Channel,
+		ID:       ev.Timestamp, // slack uses the message timestamps as identifiers within the channel
 		AuthorID: ev.User,
 		Data:     ev,
+	})
+}
+
+// See https://api.slack.com/events/reaction_added
+func (a *BotAdapter) handleReactionAddedEvent(ev *slack.ReactionAddedEvent, brain *joe.Brain) {
+	if ev.User == a.userID {
+		// reaction is from us, ignore it!
+		return
+	}
+
+	if ev.Item.Type != "message" {
+		// reactions for other things except messages is not supported by Joe
+		return
+	}
+
+	brain.Emit(reactions.Event{
+		Channel:   ev.Item.Channel,
+		MessageID: ev.Item.Timestamp,
+		AuthorID:  ev.User,
+		Reaction:  reactions.Reaction{Shortcode: ev.Reaction},
 	})
 }
 
@@ -246,6 +294,13 @@ func (a *BotAdapter) Send(text, channelID string) error {
 	)
 
 	return err
+}
+
+// React implements joe.ReactionAwareAdapter by letting the bot attach the given
+// reaction to the message.
+func (a *BotAdapter) React(reaction reactions.Reaction, msg joe.Message) error {
+	ref := slack.NewRefToMessage(msg.Channel, msg.ID)
+	return a.slack.AddReactionContext(a.context, reaction.Shortcode, ref)
 }
 
 // Close disconnects the adapter from the slack API.
