@@ -76,4 +76,4 @@ test-unit:
 dependencies: $(GOLANGCI_LINT_BIN)
 
 $(GOLANGCI_LINT_BIN):
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(FIRST_GOPATH)/bin v1.16.0
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(FIRST_GOPATH)/bin v1.23.8
