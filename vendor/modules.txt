@@ -1,13 +1,19 @@
-# github.com/go-joe/joe v0.10.0
+# github.com/go-joe/joe v0.11.0
+## explicit
 github.com/go-joe/joe
 github.com/go-joe/joe/reactions
 # github.com/go-joe/slack-adapter v1.0.0
+## explicit
 github.com/go-joe/slack-adapter
 # github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
 # github.com/machinebox/graphql v0.2.2
+## explicit
 github.com/machinebox/graphql
+# github.com/matryer/is v1.2.0
+## explicit
 # github.com/nlopes/slack v0.6.1-0.20191106133607-d06c2a2b3249
+## explicit
 github.com/nlopes/slack
 github.com/nlopes/slack/internal/errorsx
 github.com/nlopes/slack/internal/timex
@@ -19,6 +25,7 @@ go.uber.org/atomic
 # go.uber.org/multierr v1.5.0
 go.uber.org/multierr
 # go.uber.org/zap v1.14.1
+## explicit
 go.uber.org/zap
 go.uber.org/zap/buffer
 go.uber.org/zap/internal/bufferpool
