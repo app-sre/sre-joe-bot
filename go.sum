@@ -7,6 +7,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/go-joe/joe v0.9.0/go.mod h1:fjDMMKm6GV29+egH/IS57PTKHSBMquckyuM7CmXbUQw=
 github.com/go-joe/joe v0.10.0 h1:dEe0EHhHeshTDGy55Y4HGOZgj0L11TdeMlaTn5JOPQg=
 github.com/go-joe/joe v0.10.0/go.mod h1:fjDMMKm6GV29+egH/IS57PTKHSBMquckyuM7CmXbUQw=
+github.com/go-joe/joe v0.11.0 h1:hXnWx/+oRBxt+oNP7bNSlHljPaJ783A8fgvZC5KIgZY=
+github.com/go-joe/joe v0.11.0/go.mod h1:IUVL6emrTqKfI9I9zt5j4noxBRZffHFApPbok2v9mNM=
 github.com/go-joe/slack-adapter v1.0.0 h1:jfi224R4nGeK5rTcNUiecY91/6UnbX9KZKA2DdM+gKc=
 github.com/go-joe/slack-adapter v1.0.0/go.mod h1:K+h9FRMObiCMmpV2EI+9BMnOKLXagAgcATXwcZS/B14=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
