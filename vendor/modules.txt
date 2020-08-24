@@ -12,15 +12,10 @@ github.com/gorilla/websocket
 github.com/machinebox/graphql
 # github.com/matryer/is v1.2.0
 ## explicit
-# github.com/nlopes/slack v0.6.1-0.20191106133607-d06c2a2b3249
-## explicit
-github.com/nlopes/slack
-github.com/nlopes/slack/internal/errorsx
-github.com/nlopes/slack/internal/timex
-github.com/nlopes/slack/slackutilsx
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
-# github.com/slack-go/slack v0.6.5
+# github.com/slack-go/slack v0.6.6
+## explicit
 github.com/slack-go/slack
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex

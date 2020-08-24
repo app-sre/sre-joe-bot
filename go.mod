@@ -7,6 +7,6 @@ require (
 	github.com/go-joe/slack-adapter/v2 v2.1.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.2.0 // indirect
-	github.com/nlopes/slack v0.6.1-0.20191106133607-d06c2a2b3249
+	github.com/slack-go/slack v0.6.6
 	go.uber.org/zap v1.15.0
 )

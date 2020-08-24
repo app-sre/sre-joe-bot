@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/machinebox/graphql"
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 )
 
 type Bot struct {
