@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-joe/joe"
-	joeslack "github.com/go-joe/slack-adapter"
+	joeslack "github.com/go-joe/slack-adapter/v2"
 	"go.uber.org/zap"
 
 	"github.com/machinebox/graphql"

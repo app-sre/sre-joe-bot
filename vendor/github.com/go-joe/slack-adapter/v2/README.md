@@ -31,7 +31,7 @@ package main
 
 import (
 	"github.com/go-joe/joe"
-	"github.com/go-joe/slack-adapter"
+	"github.com/go-joe/slack-adapter/v2"
 )
 
 func main() {
@@ -49,15 +49,17 @@ func main() {
 }
 ```
 
-So far the adapter will emit the following events to the robot brain:
+The adapter will emit the following events to the robot brain:
 
 - `joe.ReceiveMessageEvent`
 - `joe.UserTypingEvent`
+- `reactions.Event`
 
 ## Built With
 
-* [nlopes/slack](https://github.com/nlopes/slack) - Slack API in Go
+* [slack-go/slack](https://github.com/slack-go/slack) - Slack API in Go
 * [zap](https://github.com/uber-go/zap) - Blazing fast, structured, leveled logging in Go
+* [testify](https://github.com/stretchr/testify) - A simple unit test library
 
 ## Contributing
 
@@ -69,7 +71,7 @@ contribute. If you want to hack on this repository, please read the short
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available,
-see the [tags on this repository][tags. 
+see the [tags on this repository][tags]. 
 
 ## Authors
 
