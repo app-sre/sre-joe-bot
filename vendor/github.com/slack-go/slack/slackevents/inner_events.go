@@ -29,7 +29,7 @@ type AppMentionEvent struct {
 	SourceTeam string `json:"source_team,omitempty"`
 
 	// BotID is filled out when a bot triggers the app_mention event
-	BotID    string `json:"bot_id,omitempty"`
+	BotID string `json:"bot_id,omitempty"`
 }
 
 // AppHomeOpenedEvent Your Slack app home was opened.
@@ -84,6 +84,7 @@ type sharedLinks struct {
 // TODO: Improve this so that it is not required to manually parse ChannelType
 type MessageEvent struct {
 	// Basic Message Event - https://api.slack.com/events/message
+	ClientMsgID     string      `json:"client_msg_id"`
 	Type            string      `json:"type"`
 	User            string      `json:"user"`
 	Text            string      `json:"text"`
@@ -112,6 +113,8 @@ type MessageEvent struct {
 
 	Upload bool   `json:"upload"`
 	Files  []File `json:"files"`
+
+	Attachments []slack.Attachment `json:"attachments,omitempty"`
 }
 
 // MemberJoinedChannelEvent A member joined a public or private channel
