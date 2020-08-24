@@ -27,6 +27,9 @@ func (b *Bot) CmdHelp(msg joe.Message) error {
 		"help: you're reading it",
 		"version: reports the bot version",
 		"",
+		"get bot users: List bot users",
+		"get bot user <username>: Show bot user permissions",
+		"",
 		"get clusters: List clusters",
 		"",
 		"get users: List users",
@@ -237,5 +240,30 @@ func (b *Bot) CmdGetUser(msg joe.Message) error {
 	}
 
 	msg.Respond("User %s not found", msg.Matches[0])
+	return nil
+}
+
+func (b *Bot) CmdGetBotUsers(msg joe.Message) error {
+	users, err := b.Auth.Users()
+	if err != nil {
+		msg.RespondE("There was an error while retrieving users")
+		return err
+	}
+	msg.Respond(pre(users))
+	return nil
+}
+
+func (b *Bot) CmdGetBotUser(msg joe.Message) error {
+	userID := msg.Matches[0]
+	perms, err := b.Auth.UserPermissions(userID)
+	if err != nil {
+		msg.RespondE("There was an error while retrieving user permissions: %v", err)
+		return err
+	}
+	resp := []string{
+		fmt.Sprintf("User: %s", userID),
+		fmt.Sprintf("Permissions: %s", perms),
+	}
+	msg.Respond(pre(resp))
 	return nil
 }

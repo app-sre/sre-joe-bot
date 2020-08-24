@@ -41,6 +41,9 @@ func main() {
 	bot.Respond("get user[s]?", bot.Log(bot.CmdGetUsers))
 	bot.Respond("get user[s]? (.+)", bot.Log(bot.CmdGetUser))
 
+	bot.Respond("get bot user[s]?", bot.Log(bot.Authenticate("bot.admin.read", bot.CmdGetBotUsers)))
+	bot.Respond("get bot user[s]? (.+)", bot.Log(bot.Authenticate("bot.admin.read", bot.CmdGetBotUser)))
+
 	bot.Respond("get schema[s]?", bot.Log(bot.Authenticate("bot.admin.read", bot.CmdGetSchemas)))
 	bot.Respond("get schema[s]? (.+)", bot.Log(bot.Authenticate("bot.admin.read", bot.CmdGetSchema)))
 
