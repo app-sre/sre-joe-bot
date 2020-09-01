@@ -8,5 +8,5 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.2.0 // indirect
 	github.com/slack-go/slack v0.6.6
-	go.uber.org/zap v1.15.0
+	go.uber.org/zap v1.16.0
 )
